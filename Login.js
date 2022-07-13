@@ -3,32 +3,18 @@ import { SafeAreaView, StyleSheet, TextInput, TouchableOpacity, Text } from "rea
 
 async function sendText(phoneNumber){
   console.log("PhoneNumber: ",phoneNumber);
-  await fetch('https://dev.stedi.me/twofactorlogin/' +phoneNumber,{
+  const tokenResponse = await fetch('https://dev.stedi.me/twofactorlogin/' +phoneNumber,{
     method: 'POST',
     headers:{
       'content-type':'application/text'
     }
   });
-}
-
-async function getEmail(email){
-  console.log("Email: ", email);
-  await fetch('https://dev.stedi.me/twofactorlogin/' )
-
-
-
+  const tokenResponseText = await tokenResponse.text()
 }
 
 
-//const getEmail = async ({phoneNumber})=>{
-  //const emailResponse = await fetch('https://dev.stedi.me/twofactorlogin',{
-   // method: 'POST',
 
-  //});
-
-//}
-
-const getToken = async ({phoneNumber, oneTimePassword, setUserLoggedIn}) =>{
+const getToken = async ({phoneNumber, oneTimePassword, setUserLoggedIn, setUserEmail}) =>{
   const tokenResponse = await fetch('https://dev.stedi.me/twofactorlogin',{
     method: 'POST',
     body:JSON.stringify({oneTimePassword, phoneNumber}),
@@ -41,6 +27,12 @@ const getToken = async ({phoneNumber, oneTimePassword, setUserLoggedIn}) =>{
   const responseCode = tokenResponse.status;//200 means logged in successfully
   console.log("Response Status Code", responseCode);
   if(responseCode==200){
+    const token = await tokenResponse.text();
+    console.log(token);
+    const emailResponse = await fetch('https://dev.stedi.me/validate/'+token);
+    const tokenEmail = await emailResponse.text();
+    console.log('tokenEmail: '+ tokenEmail);
+    setUserEmail(tokenEmail);
     setUserLoggedIn(true);
   }
   const tokenResponseString = await tokenResponse.text();
@@ -80,7 +72,7 @@ const Login = (props) => {
       <TouchableOpacity
       style={styles.button}
       onPress={()=>{
-        getToken({phoneNumber, oneTimePassword, setUserLoggedIn:props.setUserLoggedIn});        
+        getToken({phoneNumber, oneTimePassword, setUserLoggedIn:props.setUserLoggedIn, setUserEmail:props.setUserEmail});        
       }}
 
       >

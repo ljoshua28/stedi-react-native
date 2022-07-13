@@ -13,10 +13,12 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 // import Icons from "./Icons";
 const Tab = createMaterialBottomTabNavigator();
 
-export default function App() {
-const [userLoggedIn, setUserLoggedIn] = useState(true);
+export default function App(props) {
+const [userLoggedIn, setUserLoggedIn] = useState(false);
+const [userEmail,setUserEmail] = useState(''); // creates a state variable
 
 if (userLoggedIn){
+  console.log("email:" + userEmail)
   return(
     <NavigationContainer>
       <Tab.Navigator
@@ -25,14 +27,19 @@ if (userLoggedIn){
         barStyle={{ backgroundColor: 'green'}}
         >
           <Tab.Screen
-          name='Home'
-          component={Home}
-          options={{
-            tabBarLabel: 'Home',
-            tabBarIcon: ({ color }) => (
-              <MaterialCommunityIcons name='home' color={color} size={26} />
-            ),
-          }}
+            name='Home'
+            children = {
+              () => <Home loggedInUser = {userEmail}/>
+            }
+            //component={Home}
+
+            options={{
+              userEmail: {userEmail},
+              tabBarLabel: 'Home',
+              tabBarIcon: ({ color }) => (
+                <MaterialCommunityIcons name='home' color={color} size={26} />
+              ),
+            }}
         />
         <Tab.Screen
           name='Step Counter'
@@ -63,7 +70,8 @@ if (userLoggedIn){
 } else {
 
   return(
-    <Login setUserLoggedIn={setUserLoggedIn}/>
+    <Login setUserLoggedIn={setUserLoggedIn}
+    setUserEmail={setUserEmail}/>
   )
 }
 
